@@ -1,0 +1,20 @@
+{
+  "description": "A simple flatiron project",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "union": "0.1.7",
+    "flatiron": "0.1.13",
+    "resourceful": ">=0.0.0",
+    "connect": ">=0.0.0"
+  },
+  "devDependencies": {
+    "api-easy": "0.3.2",
+    "vows": "0.6.1"
+  },
+  "scripts": {
+    "test": "vows --spec",
+    "start": "node app.js"
+  },
+  "name": "bloggy"
+}
