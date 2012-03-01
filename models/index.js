@@ -1,3 +1,3 @@
 module.exports = {
-  Food: require('./Food').Food
+  Lunch: require('./Lunch')
 };
