@@ -1,7 +1,8 @@
-var resourceful = require('resourceful');
+var Lunch = exports,
+    resourceful = require('resourceful');
 
 
-var Day = exports.Day = resourceful.define('day', function() {  
+var Day = Lunch.Day = resourceful.define('day', function() {  
   this.use('memory');
 
   this.object('day', {
@@ -16,7 +17,7 @@ var Day = exports.Day = resourceful.define('day', function() {
 });
 
 
-var Entity = exports.Entity = resourceful.define('entity', function() {
+var Entity = Lunch.Entity = resourceful.define('entity', function() {
   this.use('memory');
 
   this.parent('Day');
