@@ -5,7 +5,7 @@
   "dependencies": {
     "union": "0.1.7",
     "flatiron": "0.1.13",
-    "resourceful": ">=0.0.0",
+    "resourceful-mongo": ">=0.0.0",
     "connect": ">=0.0.0"
   },
   "devDependencies": {

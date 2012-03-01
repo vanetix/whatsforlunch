@@ -1,3 +1,13 @@
-var Lunch = require('./models').Lunch;
+var Lunch = require('./models').Lunch,
+    Day = Lunch.Day,
+    Entity = Lunch.Entity;
 
-Lunch.Day.generate(['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7']);
+Entity.create({name: 'Taco Hello'});
+Entity.create({name: 'Mexican'});
+Entity.create({name: 'Random Third thing'});
+Entity.create({name: 'Taco Hell'});
+
+
+Day.today(function(err, day) {
+  console.dir(arguments);
+});

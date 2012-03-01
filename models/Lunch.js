@@ -1,59 +1,98 @@
 var Lunch = exports,
-    resourceful = require('resourceful');
+    resourceful = require('resourceful-mongo');
 
+
+resourceful.use('mongodb', {
+  database: 'resourceful',
+  collection: 'lunch',
+  safe: true
+});
+
+var Entity = Lunch.Entity = resourceful.define('entity', function() {
+  
+  this.string('name');
+
+  this.timestamps();
+});
 
 var Day = Lunch.Day = resourceful.define('day', function() {  
-  this.use('memory');
 
-  this.object('day', {
+  this.string('day', {
     default: new Date().toDateString(),
-    format: 'date',
     unique: true
   });
 
   this.array('voters');
-  
-  this.timestamps();
-});
-
-
-var Entity = Lunch.Entity = resourceful.define('entity', function() {
-  this.use('memory');
-
-  this.parent('Day');
-
-  this.string('name', {
-    required: true
+  this.array('entities', {
+    assert: function(val) { return val instanceof Object; }
   });
   
-  this.number('rating', {
-    default: 0
-  });
-
   this.timestamps();
 });
 
 
 /*
- * Static functions on resources
+ * Has today already been generated?
  */
-Day.generate = function(possibilities, callback) {
-  if(possibilities instanceof Array) {
-    var _i,
-        _j,
-        idx,
-        entities = [],
-        _len = possibilities.length;
+Day.__defineGetter__('isGenerated', function() {
+  var today = new Date().toDateString();
 
-    for(_i = 0, _j = 3; _i < _j; _i++, _len--) {
-      idx = Math.floor(Math.random() * _len);
-      console.log(idx);
-      entities.push(possibilities.splice(idx, 1).toString());
+  Day.find({ day: today }, function(err, day) {
+    if(err || !day || !day.length) {
+      return false;
     }
+    else {
+      return day;
+    }
+  });
+});
 
-    console.log(entities);
+
+/*
+ * Today either fetches todays entities, or generates then fetches
+ */
+Day.today = function(callback) {
+
+  var generated = Day.isGenerated;
+
+  if(!generated) {
+    var entityArr;
+
+    Entity.all(function(err, entities) {
+      if(err) {
+        return callback('Error getting entities');
+      }
+      else if(entities.length < 3) {
+        return callback('Not enough entities');
+      }
+      else {
+        entityArr = generate(entities);
+        
+        for(var i in entityArr) {
+          //TODO: loop through all entitys and push to day
+        }
+        
+        Day.create({
+      }
+    });
   }
   else {
-    throw new Error('Possibilities must be an array');
+    console.log(generated);
+    return callback(null, generated);
   }
 };
+
+function generate(entities) {
+  var _i,
+      _j,
+      idx,
+      toDay = [],
+      _len = entities.length;
+
+  for(_i = 0, _j = 2; _i < _j; _i++, _len--) {
+    idx = Math.floor(Math.random() * _len);
+    toDay.push(entities.splice(idx, 1).toString());
+  }
+
+  return toDay;
+}
