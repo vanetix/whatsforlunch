@@ -87,10 +87,12 @@ function generate(entities) {
       _j,
       idx,
       toDay = [],
+      cleanUp,
       _len = entities.length;
 
   for(_i = 0, _j = 2; _i < _j; _i++, _len--) {
     idx = Math.floor(Math.random() * _len);
+    //TODO: Clean the models
     toDay.push(entities.splice(idx, 1).toString());
   }
 
