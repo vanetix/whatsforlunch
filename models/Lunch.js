@@ -2,13 +2,14 @@ var Lunch = exports,
     resourceful = require('resourceful-mongo');
 
 
-resourceful.use('mongodb', {
-  database: 'resourceful',
-  collection: 'lunch',
-  safe: true
-});
+//this.use('mongodb', {
+//  database: 'resourceful',
+//  collection: 'lunch',
+//  safe: true
+//});
 
 var Entity = Lunch.Entity = resourceful.define('entity', function() {
+  this.use('memory');
   
   this.string('name');
 
@@ -16,6 +17,7 @@ var Entity = Lunch.Entity = resourceful.define('entity', function() {
 });
 
 var Day = Lunch.Day = resourceful.define('day', function() {  
+  this.use('memory');
 
   this.string('day', {
     default: new Date().toDateString(),
@@ -29,6 +31,21 @@ var Day = Lunch.Day = resourceful.define('day', function() {
   
   this.timestamps();
 });
+
+
+/*
+ * Upvote the entity with the specific id
+ */
+Day.prototype.incRating = function(obj, callback) {
+  //TODO: Find the record and ++ the rating
+};
+
+/*
+ * Downvote the entity with the specified id
+ */
+Day.prototype.decRating = function(obj, callback) {
+  //TODO: find the record and -- the rating
+};
 
 
 /*
@@ -49,7 +66,7 @@ Day.__defineGetter__('isGenerated', function() {
 
 
 /*
- * Today either fetches todays entities, or generates then fetches
+ * Today either fetches the current day, or generates then fetches
  */
 Day.today = function(callback) {
 
@@ -68,32 +85,41 @@ Day.today = function(callback) {
       else {
         entityArr = generate(entities);
         
-        for(var i in entityArr) {
-          //TODO: loop through all entitys and push to day
-        }
-        
-        Day.create({
+        Day.create({ entities: entityArr }, function(err, day) {
+          if(err) {
+            return callback('Error creating new day');
+          }
+          else {
+            return callback(null, day);
+          }
+        });
       }
     });
   }
   else {
-    console.log(generated);
     return callback(null, generated);
   }
 };
+
 
 function generate(entities) {
   var _i,
       _j,
       idx,
+      temp,
       toDay = [],
-      cleanUp,
       _len = entities.length;
 
   for(_i = 0, _j = 2; _i < _j; _i++, _len--) {
     idx = Math.floor(Math.random() * _len);
-    //TODO: Clean the models
-    toDay.push(entities.splice(idx, 1).toString());
+    
+    temp = {}
+    temp.id = entities[idx]._id;
+    temp.name = entities[idx].name;
+    temp.rating = 0;
+
+    entities.splice(idx, 1);
+    toDay.push(temp);
   }
 
   return toDay;
