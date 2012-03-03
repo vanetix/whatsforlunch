@@ -2,29 +2,36 @@ var Lunch = exports,
     resourceful = require('resourceful-mongo');
 
 
-//this.use('mongodb', {
-//  database: 'resourceful',
-//  collection: 'lunch',
-//  safe: true
-//});
-
 var Entity = Lunch.Entity = resourceful.define('entity', function() {
   this.use('memory');
+//  this.use('mongodb', {
+//    database: 'whatsforlunch',
+//    collection: 'entity',
+//    safe: true
+//  });
   
-  this.string('name');
+  this.string('name', {
+    unique: true,
+    required: true
+  });
 
   this.timestamps();
 });
 
 var Day = Lunch.Day = resourceful.define('day', function() {  
   this.use('memory');
+//  this.use('mongodb' {
+//    database: 'whatsforlunch',
+//    collection: 'lunch',
+//    safe: true
+//  });
 
   this.string('day', {
     default: new Date().toDateString(),
     unique: true
   });
 
-  this.array('voters');
+  this.array('votees');
   this.array('entities', {
     assert: function(val) { return val instanceof Object; }
   });
@@ -34,35 +41,111 @@ var Day = Lunch.Day = resourceful.define('day', function() {
 
 
 /*
- * Upvote the entity with the specific id
+ * Upvote the entity with the specific id or name
+ * Obj = { id, name, voter }
  */
 Day.prototype.incRating = function(obj, callback) {
-  //TODO: Find the record and ++ the rating
+  
+  if((obj.id || obj.name) && obj.voter) {
+    var _i,
+        _len = this.entities.length;
+
+    //Return if the obj.voter is already in votees
+    if(~this.votees.indexOf(obj.voter)) {
+      return callback('Votee has already voted');
+    }
+
+    if(obj.id) {
+      //Increment elements based of id
+      for(_i = 0; _i < _len; _i++) {
+        if(this.entities[_i].id == obj.id) {
+          this.entities[_i].rating++;
+          this.votees.push(obj.voter);
+          return callback(null, this);
+        }
+      }
+
+      return callback('Id not found');
+    }
+    else {
+      //Increment element based off name
+      for(_i = 0; _i < _len; _i++) {
+        if(this.entities[_i].name == obj.name) {
+          this.entities[_i].rating++;
+          this.votees.push(obj.voter);
+          return callback(null, this);
+        }
+      }
+      
+      return callback('Name not found'); 
+    }
+  }
+  else {
+    return callback('Invalid object passed');
+  }
 };
 
 /*
  * Downvote the entity with the specified id
+ * obj = { id, name, voter }
  */
 Day.prototype.decRating = function(obj, callback) {
-  //TODO: find the record and -- the rating
+
+  if((obj.id || obj.name) && obj.voter) {
+    var _i,
+        _len = this.entities.length;
+
+    //Return if the obj.voter is already in votees
+    if(~this.votees.indexOf(obj.voter)) {
+      return callback('Votee has already voted');
+    }
+    
+    if(obj.id) {
+      //Increment elements based of id
+      for(_i = 0; _i < _len; _i++) {
+        if(this.entities[_i].id == obj.id) {
+          this.entities[_i].rating--;
+          this.votees.push(obj.voter);
+          return callback(null, this);
+        }
+      }
+      
+      return callback('Id not found');
+    }
+    else {
+      //Increment element based off name
+      for(_i = 0; _i < _len; _i++) {
+        if(this.entities[_i].name == obj.name) {
+          this.entities[_i].rating--;
+          this.votees.push(obj.voter);
+          return callback(null, this);
+        }
+      }
+      
+      return callback('Name not found'); 
+    }
+  }
+  else {
+    return callback('Invalid object passed');
+  }  
 };
 
 
 /*
  * Has today already been generated?
  */
-Day.__defineGetter__('isGenerated', function() {
+Day.isGenerated = function(callback) {
   var today = new Date().toDateString();
 
   Day.find({ day: today }, function(err, day) {
     if(err || !day || !day.length) {
-      return false;
+      return callback(err, false);
     }
     else {
-      return day;
+      return callback(null, day[0]);
     }
   });
-});
+};
 
 
 /*
@@ -70,35 +153,41 @@ Day.__defineGetter__('isGenerated', function() {
  */
 Day.today = function(callback) {
 
-  var generated = Day.isGenerated;
+  Day.isGenerated(function(err, generated) {
 
-  if(!generated) {
-    var entityArr;
+    if(err) {
+      return callback(err);
+    }
 
-    Entity.all(function(err, entities) {
-      if(err) {
-        return callback('Error getting entities');
-      }
-      else if(entities.length < 3) {
-        return callback('Not enough entities');
-      }
-      else {
-        entityArr = generate(entities);
-        
-        Day.create({ entities: entityArr }, function(err, day) {
-          if(err) {
-            return callback('Error creating new day');
-          }
-          else {
-            return callback(null, day);
-          }
-        });
-      }
-    });
-  }
-  else {
-    return callback(null, generated);
-  }
+    if(!generated) {
+      var entityArr;
+
+      Entity.all(function(err, entities) {
+        if(err) {
+          return callback('Error getting entities');
+        }
+        else if(entities.length < 3) {
+          return callback('Not enough entities');
+        }
+        else {
+          entityArr = generate(entities);
+          
+          Day.create({ entities: entityArr }, function(err, day) {
+            if(err) {
+              return callback('Error creating new day');
+            }
+            else {
+              return callback(null, day);
+            }
+          });
+        }
+      });
+    }
+    else {
+      //Invoke callback with any err and generated
+      return callback(err, generated);
+    }
+  });
 };
 
 
