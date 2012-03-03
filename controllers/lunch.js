@@ -1,67 +1,61 @@
-var Food = require('../models').Food;
-
-//TODO: Nest the routes
+var Day = require('../models').Lunch.Day,
+    Entity = require('../models').Lunch.Entity;
 
 module.exports = function() {
 
+  /* ---------------- All entity routes -------------------------- */
   /*                   
-   * Get all foods
+   * Get all entities
    */
-  this.get(/\/?/, function() {
+  this.get(/[Ee]ntity\/?/, function() {
     var self = this;
 
-    Food.all(function(err, foods) {
-      if(err || !foods) {
-        self.res.json(404, { Error: 'Resources not found' });
+    Entity.all(function(err, entities) {
+      if(err || !entities) {
+        return self.res.json(404, { error: 'Resources not found' });
       }
       else {
-        self.res.json(200, foods);
+        return self.res.json(200, entities);
       }
     });
   });
 
 
   /*
-   * Create a new food
+   * Create a new entity
+   * TODO: name should be unique
    */
-  this.post(/\/?/, function() {
+  this.post(/[Ee]ntity\/?/, function() {
     var self = this,
         data = this.req.body;
 
-    if(!data || !data.name) {
-      return self.req.json(400, { Error: 'Invalid food' });
+    if(data && data.name) {
+      Entity.create({ name: data.name }, function(err, entity) {
+        if(err || !entity) {
+          return self.res.json(500, { error: 'Unable to create entity' });
+        }
+        
+        return self.res.json(201, entity);
+      });
     }
-    
-    Food.find({ name: data.name }, function(err, food) {
-
-      if(err) return self.res.json(500, { Error: 'Problem finding duplicate' });
-      if(food.length) return self.res.json(400, { Error: 'Duplicate food exists' });
-
-      Food.create({ name: data.name, rating: 0 }, function(err, food) {
-        if(err) {
-          return self.res.json(500, { Error: 'Problem creating food' });
-        }
-        else {
-          return self.res.json(201, food);
-        }
-      }); 
-    });
-
+    else {
+      return self.res.json(400, { error: 'Invalid entity object' });
+    }
   });
 
 
   /*
-   * Get this particular food
+   * Get this particular entity
    */
-  this.get(/\/(\d+)/, function (id) {
+  this.get(/[Ee]ntity\/(\d+)\/?/, function (id) {
     var self = this;
 
-    Food.get(id, function(err, food) {
+    Entity.get(id, function(err, entity) {
       if(err || !food) {
-        self.res.json(404, { Error: 'Resource not found' });
+        return self.res.json(404, { error: 'Entity not found' });
       }
       else {
-        self.res.json(200, food);
+        return self.res.json(200, entity);
       }
     });
   });
@@ -70,66 +64,124 @@ module.exports = function() {
   /*
    * Update the food
    */
-  this.put(/\/(\d+)/, function(id) {
+  this.put(/[Ee]ntity\/(\d+)\/?/, function(id) {
     var self = this,
-        data = this.req.body,
-        votee = this.req.response.connection.address().address;
+        data = this.req.body;
 
-    if(!data || !id) {
-      return self.res.json(400, { Error: 'Invalid food' });
+    if(!data || !data.name) {
+      return self.res.json(400, { error: 'Invalid food' });
     }
 
-    Food.get(id, function(err, food) {
-      if(err || !food) {
-        return self.res.json(404, { Error: 'Food not found' });
-      }
+    /* Currently resource.update doesn't catch an error that is throw if the
+     * resource doesn't exist before the update, this is nasty, but frankly
+     * keeps the code cleaner than an async lookup
+     */
+    try {
+      Entity.update(id, { name: data.name }, function(err, entity) {
+        if(err || !entity) {
+          return self.res.json(500, { error: 'Error updating entity' });
+        }
 
-      var dup = food.voters.some(function(voter) {
-        return voter === votee;
+        return self.res.json(200, entity);
       });
-
-      if(!dup) {
-        food.voters.push(votee);
-        
-        food.rating = data.rating;
-        
-        food.save(function(err) {
-          if(err) {
-            console.log(err);
-            return self.res.json(500, { Error: 'Problem updating food' });
-          }
-          return self.res.json(200, food);
-        });
-      }
-      else {
-        self.res.json(400, { Error: 'You already voted on this item' });
-      }
-    });
+    } catch(Error) {
+      return self.res.json(404, { error: 'Entity not found' });
+    }
   });
 
 
   /*
    * Delete the food
    */
-  this.delete(/\/(d+)/, function(id) {
+  this.delete(/[Ee]ntity\/(\d+)\/?/, function(id) {
     var self = this;
 
-    if(!id) {
-      return self.res.json(404, { Error: 'Invalid food' });
-    }
-    else {
-      Food.get(id, function(err, food) {
-        if(err || !food) {
-          return self.res.json(404, { Error: 'Food not found' });
+    Entity.destroy(id, function(err, entity) {
+
+      console.dir(arguments);
+
+      if(err || !entity) {
+        return self.res.json(404, { error: 'Error retrieving entity' });
+      }
+      
+    });
+
+  });
+
+  
+  /* ------------- Day specific routes ------------------- */
+  this.get(/[Dd]ay\/?(\d*)\/?/, function(id) {
+    var self = this;
+
+    if(id) {
+      Day.get(id, function(err, day) {
+        if(err) {
+          return self.res.json(500, { error: 'Error while fetching day' });
         }
-        else {
-          food.destroy(function(err) {
-            if(err) return self.res.json(500, { Error: 'Unable to delete food' });
-            return self.res.json(200, { Status: 'ok' });
-          });
-       }
+
+        return self.res.json(200, day);
       });
     }
+    else {
+      Day.all(function(err, days) {
+        if(err) {
+          return self.res.json(500, { error: 'Error wile fetching days' });
+        }
+
+        return self.res.json(200, days);
+      });
+    }
+
+  });
+  
+
+  /*
+   * ---------------------- All Day methods -----------------------
+   * votee = this.req.response.connection.address().address;
+   */
+  /* 
+   * Lunch index route
+   */
+  this.get('', function() {
+    var self = this;
+
+    Day.today(function(err, today) {
+      if(err) {
+        return self.res.json(500, { error: err });
+      }
+      
+      return self.res.json(200, today);
+    });
+  });
+
+  
+  /*
+   * Vote on a lunch
+   * post data must include the id of the voted item
+   */
+  this.put(/vote\/?/, function() {
+    var self = this,
+        data = this.req.body;
+
+    if(!data) {
+      return self.res.json(400, { error: 'Invalid update object' });
+    }
+
+    console.dir(data);
+
+    Day.today(function(err, today) {
+      if(err) {
+        return self.res.json(500, { error: err });
+      }
+      
+      today.incRating(data, function(err, today) {
+        if(err) {
+          return self.res.json(500, { error: err });
+        }
+        
+        return self.res.json(200, today);
+      });
+    });
   });
 
 };
