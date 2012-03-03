@@ -15,5 +15,5 @@
 - *Get* /lunch/day/:id - Returns day with id, :id
 
 ## Today
-- *Get* /lunch/today/ - Returns the current poll for today
-- *Put* /lunch/today/vote - Update the current day, data = entity({ id|name })
+- *Get* /lunch/ - Returns the current poll for today
+- *Put* /lunch/vote - Update the current day, data = entity({ id|name })
