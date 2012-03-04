@@ -65,7 +65,7 @@ Day.prototype.incRating = function(obj, callback) {
         }
       }
 
-      return callback('Id not found');
+      return callback('ID not found on day');
     }
     else {
       //Increment element based off name
@@ -77,7 +77,7 @@ Day.prototype.incRating = function(obj, callback) {
         }
       }
       
-      return callback('Name not found'); 
+      return callback('Name of entity not found in day'); 
     }
   }
   else {
