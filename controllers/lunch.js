@@ -51,7 +51,7 @@ module.exports = function() {
     var self = this;
 
     Entity.get(id, function(err, entity) {
-      if(err || !food) {
+      if(err || !entity) {
         return self.res.json(404, { error: 'Entity not found' });
       }
       else {
@@ -62,14 +62,14 @@ module.exports = function() {
 
 
   /*
-   * Update the food
+   * Update the entity
    */
   this.put(/[Ee]ntity\/(\d+)\/?/, function(id) {
     var self = this,
         data = this.req.body;
 
     if(!data || !data.name) {
-      return self.res.json(400, { error: 'Invalid food' });
+      return self.res.json(400, { error: 'Invalid entity' });
     }
 
     /* Currently resource.update doesn't catch an error that is throw if the
@@ -96,14 +96,12 @@ module.exports = function() {
   this.delete(/[Ee]ntity\/(\d+)\/?/, function(id) {
     var self = this;
 
-    Entity.destroy(id, function(err, entity) {
-
-      console.dir(arguments);
-
-      if(err || !entity) {
+    Entity.destroy(id, function(err) {
+      if(err) {
         return self.res.json(404, { error: 'Error retrieving entity' });
       }
-      
+
+      return self.res.json(200, { status: 'ok' });
     });
 
   });
@@ -142,7 +140,7 @@ module.exports = function() {
   /* 
    * Lunch index route
    */
-  this.get('', function() {
+  this.get(/\/?/, function() {
     var self = this;
 
     Day.today(function(err, today) {
@@ -166,8 +164,6 @@ module.exports = function() {
     if(!data) {
       return self.res.json(400, { error: 'Invalid update object' });
     }
-
-    console.dir(data);
 
     Day.today(function(err, today) {
       if(err) {

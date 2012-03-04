@@ -135,9 +135,11 @@ Day.prototype.decRating = function(obj, callback) {
  * Has today already been generated?
  */
 Day.isGenerated = function(callback) {
-  var today = new Date().toDateString();
+  var today = new Date();
 
-  Day.find({ day: today }, function(err, day) {
+  console.log(today);
+
+  Day.find({ day: today.toDateString() }, function(err, day) {
     if(err || !day || !day.length) {
       return callback(err, false);
     }
