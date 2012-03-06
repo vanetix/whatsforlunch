@@ -1,3 +1,4 @@
 module.exports = {
-  Lunch: require('./Lunch')
+  Day: require('./Lunch').Day,
+  Entity: require('./Lunch').Entity
 };

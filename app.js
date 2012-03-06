@@ -14,7 +14,10 @@ app.http.before = [
 
 
 //Load all controllers
-app.router.path('/lunch/', controllers.Lunch);
+app.router.path('/[Ll]unch/', controllers.Lunch);
+app.router.path(/[Dd]ay/i, controllers.Day);
+app.router.path(/[Ee]ntity/i, controllers.Entity);
 
 
+//Start the app
 app.start(3000);
