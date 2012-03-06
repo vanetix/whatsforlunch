@@ -38,7 +38,7 @@ module.exports = (robot) ->
 
 #GET/POST/DELETE - Basically a controller for entities
 locationDispatcher = (msg, method) ->
-  url = LUNCH_SERVER + '/lunch/entity/'
+  url = LUNCH_SERVER + '/entity/'
 
   if method is 'get'
     msg.http(url)
