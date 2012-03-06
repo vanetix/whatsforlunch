@@ -4,9 +4,10 @@
 # lunch-locations add - add a location for lunch
 # lunch-locations delete - delete the specific lunch location
 #
-# lunch-choices - get the current choices for today
-# lunch-today - get the highest rated location for today
+# lunch-today - get the current choices for today
 # lunch-vote <id | name> vote on the current locations
+#
+# what's for lunch? - get the highest rated location for today
 #
 
 LUNCH_SERVER = process.env.LUNCH_SERVER
