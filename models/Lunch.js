@@ -9,7 +9,7 @@ var Entity = Lunch.Entity = resourceful.define('entity', function() {
 //    collection: 'entity',
 //    safe: true
 //  });
-  
+
   this.string('name', {
     unique: true,
     required: true
@@ -18,7 +18,7 @@ var Entity = Lunch.Entity = resourceful.define('entity', function() {
   this.timestamps();
 });
 
-var Day = Lunch.Day = resourceful.define('day', function() {  
+var Day = Lunch.Day = resourceful.define('day', function() {
   this.use('memory');
 //  this.use('mongodb' {
 //    database: 'whatsforlunch',
@@ -26,8 +26,10 @@ var Day = Lunch.Day = resourceful.define('day', function() {
 //    safe: true
 //  });
 
+  /* I think new Date().toDateString() is being executed when the schema is created,
+   * thus binding the default to the day the server is started
+   */
   this.string('day', {
-    default: new Date().toDateString(),
     unique: true
   });
 
@@ -35,7 +37,7 @@ var Day = Lunch.Day = resourceful.define('day', function() {
   this.array('entities', {
     assert: function(val) { return val instanceof Object; }
   });
-  
+
   this.timestamps();
 });
 
@@ -45,7 +47,7 @@ var Day = Lunch.Day = resourceful.define('day', function() {
  * Obj = { id, name, voter }
  */
 Day.prototype.incRating = function(obj, callback) {
-  
+
   if((obj.id || obj.name) && obj.voter) {
     var _i,
         _len = this.entities.length;
@@ -76,8 +78,8 @@ Day.prototype.incRating = function(obj, callback) {
           return callback(null, this);
         }
       }
-      
-      return callback('Name of entity not found in day'); 
+
+      return callback('Name of entity not found in day');
     }
   }
   else {
@@ -99,7 +101,7 @@ Day.prototype.decRating = function(obj, callback) {
     if(~this.votees.indexOf(obj.voter)) {
       return callback('Votee has already voted');
     }
-    
+
     if(obj.id) {
       //Increment elements based of id
       for(_i = 0; _i < _len; _i++) {
@@ -109,7 +111,7 @@ Day.prototype.decRating = function(obj, callback) {
           return callback(null, this);
         }
       }
-      
+
       return callback('Id not found');
     }
     else {
@@ -121,13 +123,13 @@ Day.prototype.decRating = function(obj, callback) {
           return callback(null, this);
         }
       }
-      
-      return callback('Name not found'); 
+
+      return callback('Name not found');
     }
   }
   else {
     return callback('Invalid object passed');
-  }  
+  }
 };
 
 
@@ -136,8 +138,6 @@ Day.prototype.decRating = function(obj, callback) {
  */
 Day.isGenerated = function(callback) {
   var today = new Date();
-
-  console.log(today);
 
   Day.find({ day: today.toDateString() }, function(err, day) {
     if(err || !day || !day.length) {
@@ -173,8 +173,8 @@ Day.today = function(callback) {
         }
         else {
           entityArr = generate(entities);
-          
-          Day.create({ entities: entityArr }, function(err, day) {
+
+          Day.create({ day: new Date().toDateString(), entities: entityArr }, function(err, day) {
             if(err) {
               return callback('Error creating new day');
             }
@@ -203,7 +203,7 @@ function generate(entities) {
 
   for(_i = 0, _j = 2; _i < _j; _i++, _len--) {
     idx = Math.floor(Math.random() * _len);
-    
+
     temp = {}
     temp.id = entities[idx]._id;
     temp.name = entities[idx].name;
