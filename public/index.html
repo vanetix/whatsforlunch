@@ -1,16 +1,70 @@
 <html>
   <head>
-    <title>Flatiron Test</title>
+    <title>Lunch Dashboard</title>
     <link rel="stylesheet" href="/css/bootstrap.css">
     <link rel="stylesheet" href="/css/stylesheet.css">
+    <style type="text/css">
+      body {
+        padding: 40px 0;
+      }
+      #content h1 {
+        margin-bottom: 10px;
+      }
+    </style>
     <script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/underscore.js"></script>
     <script type="text/javascript" src="js/backbone.js"></script>
-    <script type="text/javascript" src="/js/foods.js"></script>
+    <script type="text/javascript" src="js/mustache.js"></script>
+    <script type="text/javascript" src="/js/templates.js"></script>
+    <script type="text/javascript" src="/js/app.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+
+        //Just sets the active tab after a refresh
+        if(location.hash) {
+          $('.nav.nav-tabs li').each(function(idx, li) {
+            if($('a', li).attr('href') === location.hash) {
+              $(li).addClass('active');
+              $(li).siblings('li').removeClass('active');
+              return false;
+            }
+          });
+        }
+
+        //Toggle the nav classes
+        $('.nav.nav-tabs li').click(function(e) {
+          $(this).siblings('li').removeClass('active');
+          $(this).addClass('active');
+        });
+
+
+        var app = new Fooder();
+        Backbone.history.start();
+      });
+    </script>
   </head>
   <body>
-    <div class="container-fluid">
-      <h4>Rate dem foods</h4>
+    <div class="container">
+      <div id="content" class="container-fluid">
+        <h1>What's for lunch?</h1>
+        <div class="hero-unit">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#/current" title="Today">Today</a></li>
+            <li><a href="#/days" title="Days">Days</a></li>
+            <li><a href="#/entities" title="Entities">Entities</a></li>
+          </ul>
+          <!-- Backbone content -->
+          <div id="view" class="pane"></div>
+        </div>
+      </div>
     </div>
+    <!-- I hate this style of templates, but it's the quickiest/dirtiest way -->
+    <script type="text/template" id="entity-item">
+      <ul class="entity">
+        <li>
+      </ul>
+    </script>
+    <script type="text/template" id="entity-item">
+    </script>
   </body>
 </html>
