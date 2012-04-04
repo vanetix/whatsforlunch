@@ -27,7 +27,7 @@ app.publisher = new Publisher({
   emitter: app.emitter,
   namespace: 'lunch'
 });
-app.publisher.bindEvent([ 'day:vote', 'day:new' ]);
+app.publisher.bindEvent([ 'day:update', 'day:new' ]);
 
 
 /*

@@ -74,7 +74,7 @@ Lunch.Day = function(app) {
             /*
              * Fire the event `day:vote` on vote
              */
-            app.emitter.emit('day:vote', this);
+            app.emitter.emit('day:update', this);
             return callback(null, this);
           }
         }
@@ -91,7 +91,7 @@ Lunch.Day = function(app) {
             /*
              * Fire the event `day:vote` on vote
              */
-            app.emitter.emit('day:vote', this);
+            app.emitter.emit('day:update', this);
             return callback(null, this);
           }
         }
