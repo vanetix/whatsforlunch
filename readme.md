@@ -1,8 +1,9 @@
 # What's for lunch?
 ## Generates some sweet lunch polls from an entity collection
 
-###Bugs
-- If the day changes while the server is up, it will continue to make new days
+## Todo
+- better random lunch algorithm?
+- **tests**
 
 
 # Api Methods

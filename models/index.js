@@ -1,4 +1,8 @@
-module.exports = {
-  Day: require('./Lunch').Day,
-  Entity: require('./Lunch').Entity
+module.exports = function(app) {
+
+  return {
+    Day: require('./Lunch').Day(app),
+    Entity: require('./Lunch').Entity
+  };
+
 };

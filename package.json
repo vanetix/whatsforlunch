@@ -1,12 +1,14 @@
 {
-  "description": "A simple flatiron project",
-  "version": "0.0.0",
+  "name": "whats-for-lunch",
+  "description": "lunch poll generator",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "union": "0.1.7",
     "flatiron": "0.1.13",
     "resourceful-mongo": ">=0.0.0",
-    "connect": ">=0.0.0"
+    "connect": ">=0.0.0",
+    "node-redis-events": "git://github.com/vanetix/node-redis-events.git"
   },
   "devDependencies": {
     "api-easy": "0.3.2",
@@ -15,6 +17,5 @@
   "scripts": {
     "test": "vows --spec",
     "start": "node app.js"
-  },
-  "name": "bloggy"
+  }
 }
