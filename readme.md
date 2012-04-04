@@ -21,3 +21,7 @@
 ## Today
 - *Get* /lunch/ - Returns the current poll for today
 - *Put* /lunch/vote - Update the current day, data = entity({ id|name })
+
+# Day generation
+- A new day is generated at the first request for a new day.
+- *You could automate day generation with cron*
