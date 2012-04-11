@@ -6,6 +6,7 @@
 - *You could automate day generation with cron*
 
 ## Todo
+- integrate resourceful-redis, and a new model for storing the used entities for the week
 - better random lunch algorithm?
 - **tests**
 
