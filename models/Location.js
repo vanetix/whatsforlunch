@@ -1,4 +1,4 @@
-var Location = module.exports = exports,
+var Location,
     resourceful = require('resourceful-redis');
 
 
@@ -8,7 +8,7 @@ var Location = module.exports = exports,
  * @attribute {String} name location name
  * @attribute {Boolean} exclude exclude the day from the generation?
  */
-Location = resourceful.define('location', function() {
+Location = module.exports = resourceful.define('location', function() {
   /**
    * Engine definition
    */
@@ -20,7 +20,7 @@ Location = resourceful.define('location', function() {
   this.string('name', {
     required: true
   });
-  this.boolean('exclude', {
+  this.bool('exclude', {
     required: true,
     default: false
   });

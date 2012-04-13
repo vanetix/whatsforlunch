@@ -1,6 +1,7 @@
 var Location = require('./Location'),
     resourceful = require('resourceful-redis');
 
+
 /**
  * Day model needs the `app` instance for it's emitter
  *
