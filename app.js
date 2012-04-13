@@ -38,9 +38,9 @@ app.controllers = controllers(app);
 
 
 //Load all controllers
-app.router.path('/[Ll]unch/', app.controllers.Lunch);
-app.router.path(/[Dd]ay/i, app.controllers.Day);
-app.router.path(/[Ee]ntity/i, app.controllers.Entity);
+app.router.path('/lunch/i', app.controllers.Lunch);
+app.router.path(/day/i, app.controllers.Day);
+app.router.path(/entity/i, app.controllers.Entity);
 
 
 //Start the app
