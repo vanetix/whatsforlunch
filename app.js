@@ -16,6 +16,10 @@ app.http.before = [
   connect.static(__dirname + '/public')
 ];
 
+/**
+ * CORS header
+ */
+app.http.headers['Access-Control-Allow-Origin'] = '*';
 
 /*
  * Initialize our event emitter and bind the publish events
