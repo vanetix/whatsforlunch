@@ -7,15 +7,14 @@
     "union": "0.1.7",
     "flatiron": "0.1.13",
     "resourceful-redis": ">=0.1.0",
-    "connect": ">=2.1.2",
     "node-redis-events": "git://github.com/vanetix/node-redis-events.git"
   },
   "devDependencies": {
     "api-easy": "0.3.2",
-    "vows": "0.6.1"
+    "mocha": "1.0.1"
   },
   "scripts": {
-    "test": "vows --spec",
+    "test": "mocha test/",
     "start": "node app.js"
   }
 }
