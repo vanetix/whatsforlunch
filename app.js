@@ -1,5 +1,4 @@
 var flatiron = require('flatiron'),
-    connect = require('connect'),
     path = require('path'),
     EventEmitter = require('events').EventEmitter,
     Publisher = require('node-redis-events').Publisher,
@@ -10,12 +9,6 @@ var flatiron = require('flatiron'),
 
 app.config.file({ file: path.join(__dirname, 'config', 'config.json') });
 app.use(flatiron.plugins.http);
-
-//Static middleware
-app.http.before = [
-  connect.static(__dirname + '/public')
-];
-
 
 /*
  * Initialize our event emitter and bind the publish events
