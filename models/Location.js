@@ -98,11 +98,14 @@ Location = module.exports = resourceful.define('location', function() {
  *
  * @return {Array} array of all locations were `used` is false
  */
-Location.avaliable = function(callback) {
+Location.available = function(callback) {
   Location.all(function(err, locations) {
     if(err) return callback(err);
-    if(locations.length < 7) return cb(new Error('not enough locations left'));
-
+    if(locations.length < 7) return callback(new Error('not enough locations left'));
+    locations = locations.filter(function(location) {
+      return typeof location.used === 'undefined' || !location.used;
+    });
+    return callback(null, locations);
   });
 };
 

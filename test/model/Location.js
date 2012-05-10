@@ -90,4 +90,13 @@ describe('used', function() {
       done();
     });
   });
+
+  it('throw error on .available', function(done) {
+    Location.available(function(err, locations) {
+      should.exist(err);
+      err.should.be.instanceof(Error);
+      should.not.exist(locations);
+      done();
+    });
+  });
 });
