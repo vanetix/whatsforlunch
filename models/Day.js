@@ -8,6 +8,8 @@ var Day,
 /**
  * Day model needs the `app` instance for it's emitter
  *
+ * TODO: remove day attribute, and use ctime instead.
+ *
  * @param {Object} app application instance
  */
 module.exports = function(app) {
@@ -230,15 +232,16 @@ function shuffleArray(arr) {
  * @param {Array} arr array to reorder
  */
 function reorderWeight(arr) {
-  var i, len,
-      swap, today = new Date();
+  var i, len, swap,
+      weekday = new Date().getDay();
 
+  weekday = WEEKDAYS[weekday].replace(/,$/, '').toLowerCase();
   arr = shuffleArray(arr);
 
   for(i = 0, len = arr.length; i < len; i++) {
     if(arr[i].weight && arr[i].weight.length &&
-        ~arr[i].weight.indexOf(WEEKDAYS[today.getDay()])) {
-      swap = arr.slice(i, 1);
+        ~arr[i].weight.indexOf(weekday)) {
+      swap = arr.splice(i, 1)[0];
       arr.unshift(swap);
     }
   }

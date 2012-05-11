@@ -1,5 +1,11 @@
 var should = require('should'),
-    Location = require('../../models')({}).Location;
+    Location = require('../../models')({}).Location,
+    redis = require('redis').createClient();
+
+
+before(function() {
+  redis.FLUSHDB();
+});
 
 
 describe('generic', function() {

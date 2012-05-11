@@ -67,6 +67,7 @@ Location = module.exports = resourceful.define('location', function() {
     var weekday = sanitizeWeekday(day);
 
     if(!~this.weight.indexOf(weekday)) this.weight.push(weekday);
+    return this;
   };
 
   /**
@@ -76,6 +77,7 @@ Location = module.exports = resourceful.define('location', function() {
    */
   this.prototype.removeWeight = function(day) {
     var idx = this.weight.indexOf(sanitizeWeekday(day));
+
     return idx === -1 ? null : this.weight.splice(idx, 1);
   };
 
@@ -124,15 +126,12 @@ function validate(instance, callback) {
   if(instance.name) {
     var name = instance.name.toLowerCase();
     Location.find({ name: name }, function(err, locations) {
-      if(err) {
-        return callback(err);
-      }
-      else if(locations && locations.length !== 0) {
+      if(err) return callback(err);
+      if(locations && locations.length !== 0 &&
+        !(instance.id && instance.id === locations[0].id)) {
         return callback(new Error('location is already present'));
       }
-      else {
-        return callback(null);
-      }
+      return callback(null);
     });
   }
   else {
