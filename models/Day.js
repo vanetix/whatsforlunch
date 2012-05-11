@@ -1,6 +1,9 @@
-var Location = require('./Location'),
-    resourceful = require('resourceful-redis');
-
+var Day,
+    Location = require('./Location'),
+    resourceful = require('resourceful-redis'),
+    WEEKDAYS = [
+      'Sunday,', 'Monday,', 'Tuesday,',
+      'Wednesday,', 'Thursday,', 'Friday,', 'Saturday,' ];
 
 /**
  * Day model needs the `app` instance for it's emitter
@@ -16,11 +19,14 @@ module.exports = function(app) {
    * @attribute {Array} votees people who voted on the day
    * @attribute {Array} locations locations up for vote on the day
    */
-  var Day = resourceful.define('day', function() {
+  Day = resourceful.define('day', function() {
     /**
      * Engine definition
      */
-    this.use('memory');
+    this.use('redis' ,{
+      uri: 'redis://127.0.0.1:6379',
+      namespace: 'days'
+    });
 
 
     /**
@@ -28,26 +34,13 @@ module.exports = function(app) {
      */
     this.string('day', {
       set: function() {
-        var date = new Date(),
-            DAYS = [
-              'Sunday', 'Monday', 'Tuesday',
-              'Wednesday', 'Thursday', 'Friday', 'Saturday'
-            ];
-
+        var date = new Date();
         return date.toDateString()
-                    .replace(
-                      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)/,
-                      DAYS[date.getDay()]);
+                .replace(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)/, WEEKDAYS[date.getDay()]);
       }
     });
     this.array('votees');
-    this.array('locations', {
-      set: function(val) {
-        generateDay(function(err, day) {
-          val = err || day;
-        });
-      }
-    });
+    this.array('locations');
     this.timestamps();
 
 
@@ -73,7 +66,7 @@ module.exports = function(app) {
 
           for(i = 0; i < len; i++) {
             if(locations[i].id === attrs.id ||
-                  locations[i].name === attrs.name) {
+                  locations[i].name.toLowerCase() === attrs.name.toLowerCase()) {
 
               locations[i].rating += 1;
               voters.push(attrs.voter);
@@ -110,6 +103,19 @@ module.exports = function(app) {
     });
 
     /**
+     * Generate the new days on `create`
+     *
+     * @event {create}
+     */
+    this.before('create', function(instance, callback) {
+      generateDay(function(err, arr) {
+        if(err) return callback(err);
+        instance.locations = arr;
+        return callback(null);
+      });
+    });
+
+    /**
      * Emit model events
      *
      * @event {update}
@@ -119,6 +125,27 @@ module.exports = function(app) {
     });
 
   });
+
+  /**
+   * Get the current day
+   *
+   * @param {Function} cb callback function invoked with err, day
+   */
+  Day.current = function(cb) {
+    var today = new Date();
+    today = today.toDateString()
+              .replace(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)/, WEEKDAYS[today.getDay()]);
+
+    Location.find({ day: today }, function(err, current) {
+      if(err) return cb(err);
+      if(current && current.length) return cb(null, current[0]);
+
+      Location.create({}, function(err, location) {
+        if(err) return cb(err);
+        return cb(null, location);
+      });
+    });
+  };
 
 
   return Day;
@@ -153,30 +180,68 @@ function validate(instance, callback) {
 
 /**
  * Helper function to generate an array of `Day` models
+ * triggered on `create` event
  *
  * @param {Function} callback arguments `err, locations`
  * @return {Function}
  */
 function generateDay(callback) {
-  var i, j, idx, temp, newLocations, len;
+  var top, error = null;
 
-  Location.all(function(err, locations) {
+  Location.available(function(err, locations) {
     if(err) return callback(err);
-    if(locations.length <= 8) return callback(new Error('too few locations'));
 
-    for(i = 0; i < len; len--) {
-      idx = Math.floor(Math.random() * len);
+    top = reorderWeight(locations).slice(0, 2);
+    top.forEach(function(location) {
+      //Once a location is picked for the week it's considered used
+      location.use();
+      location.save(function(err) {
+        error = error || err;
+      });
+    });
 
-      temp = {
-        id: locations[idx]._id,
-        name: locations[idx].name,
-        rating: 0
-      };
-
-      locations.slice(idx, 1);
-      newLocations.push(temp);
-    }
-
-    return callback(err, locations);
+    //Set used status
+    return callback(error, top);
   });
+}
+
+/**
+ * Shuffle the specified `arr` used be `reorderWeight` function
+ *
+ * @param {Array} arr array to shuffle
+ * @return {Array}
+ */
+function shuffleArray(arr) {
+  var shuffled = [], rand, i, len;
+
+  for(i = 0, len = arr.length; i < len; i++) {
+    rand = Math.floor(Math.random() * (i + 1));
+    shuffled[i] = shuffled[rand];
+    shuffled[rand] = arr[i];
+  }
+
+  return shuffled;
+}
+
+/**
+ * Reorder the array depending on the `element.weight`
+ * used by `generateDay` function
+ *
+ * @param {Array} arr array to reorder
+ */
+function reorderWeight(arr) {
+  var i, len,
+      swap, today = new Date();
+
+  arr = shuffleArray(arr);
+
+  for(i = 0, len = arr.length; i < len; i++) {
+    if(arr[i].weight && arr[i].weight.length &&
+        ~arr[i].weight.indexOf(WEEKDAYS[today.getDay()])) {
+      swap = arr.slice(i, 1);
+      arr.unshift(swap);
+    }
+  }
+
+  return arr;
 }
