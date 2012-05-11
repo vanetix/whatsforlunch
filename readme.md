@@ -1,27 +1,29 @@
 # What's for lunch?
-## Generates a lunch poll from a location/entity collection
+## Generates a lunch poll from a location/location collection
 
 # Day generation
 - A new day is generated at the first request for a new day.
 - *You could automate day generation with cron*
 
+
 ## Todo
-- integrate resourceful-redis, and a new model for storing the used entities for the week
-- better random lunch algorithm?
+- locations are added to the current used set when they are voted the highest for the day
 - **tests**
+
+
 
 # Api Methods
 ### Entity
-- *Get* /entity/ - Returns all entities
-- *Get* /entity/:id - Returns entity with id, :id
-- *Post* /entity/ - Create new entity
-- *Put* /entity/:id - Update entity with id, :id
-- *Delete* /entity/:id - Delete entity with id, :id
- 
+- *Get* /location/ - Returns all entities
+- *Get* /location/:id - Returns location with id, :id
+- *Post* /location/ - Create new location
+- *Put* /location/:id - Update location with id, :id - only allows the update of weighs for a location
+- *Delete* /location/:id - Delete location with id, :id
+
 ### Day
 - *Get* /day/ - Returns all days
 - *Get* /day/:id - Returns day with id, :id
- 
+
 ### Today
-- *Get* /lunch/ - Returns the current poll for today
-- *Put* /lunch/vote - Update the current day, data = entity({ id|name })
+- *Get* /day/today - Returns the current poll for today
+- *Put* /day/vote - Update the current day, data = location({ id|name })
