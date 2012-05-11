@@ -6,12 +6,13 @@
   "dependencies": {
     "union": "0.1.7",
     "flatiron": "0.1.13",
-    "resourceful-redis": ">=0.1.0",
+    "resourceful-redis": ">=0.1.1",
     "node-redis-events": "git://github.com/vanetix/node-redis-events.git"
   },
   "devDependencies": {
-    "api-easy": "0.3.2",
-    "mocha": "1.0.1"
+    "mocha": "1.0.2",
+    "should": "0.6.2",
+    "redis": "0.7.2"
   },
   "scripts": {
     "test": "mocha test/",
