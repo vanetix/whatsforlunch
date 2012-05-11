@@ -26,10 +26,15 @@ describe('generic', function() {
     day.should.have.property('locations').with.instanceof(Array);
     day.should.have.property('votees').with.instanceof(Array);
     day.should.have.property('day').and.be.a('string');
-
-    console.log(day);
     day.locations.should.have.lengthOf(2);
   });
 
-  //it('should pro')
+  it('should properly return current', function(done) {
+    Day.current(function(err, day) {
+      should.not.exist(err);
+      should.exist(day);
+      day.should.equal(day);
+      done();
+    });
+  });
 });

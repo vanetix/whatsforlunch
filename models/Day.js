@@ -131,18 +131,18 @@ module.exports = function(app) {
    *
    * @param {Function} cb callback function invoked with err, day
    */
-  Day.current = function(cb) {
+  Day.current = function(callback) {
     var today = new Date();
     today = today.toDateString()
               .replace(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)/, WEEKDAYS[today.getDay()]);
 
-    Location.find({ day: today }, function(err, current) {
-      if(err) return cb(err);
-      if(current && current.length) return cb(null, current[0]);
+    Day.find({ day: today }, function(err, current) {
+      if(err) return callback(err);
+      if(current && current.length) return callback(null, current[0]);
 
-      Location.create({}, function(err, location) {
-        if(err) return cb(err);
-        return cb(null, location);
+      Day.create({}, function(err, day) {
+        if(err) return callback(err);
+        return callback(null, day);
       });
     });
   };
