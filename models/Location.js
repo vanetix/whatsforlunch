@@ -13,7 +13,10 @@ Location = module.exports = resourceful.define('location', function() {
   /**
    * Engine definition
    */
-  this.use('memory');
+  this.use('redis' ,{
+      uri: 'redis://127.0.0.1:6379',
+      namespace: 'locations'
+    });
 
   /**
    * Properties
@@ -101,10 +104,10 @@ Location = module.exports = resourceful.define('location', function() {
 Location.available = function(callback) {
   Location.all(function(err, locations) {
     if(err) return callback(err);
-    if(locations.length < 7) return callback(new Error('not enough locations left'));
     locations = locations.filter(function(location) {
       return typeof location.used === 'undefined' || !location.used;
     });
+    if(locations.length < 2) return callback(new Error('not enough locations left'));
     return callback(null, locations);
   });
 };

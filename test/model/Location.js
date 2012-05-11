@@ -91,11 +91,13 @@ describe('used', function() {
     });
   });
 
-  it('throw error on .available', function(done) {
+  it('return locations .available', function(done) {
     Location.available(function(err, locations) {
-      should.exist(err);
-      err.should.be.instanceof(Error);
-      should.not.exist(locations);
+      should.not.exist(err);
+      should.exist(locations);
+      locations.forEach(function(location) {
+        location.should.have.property('used', false);
+      });
       done();
     });
   });
