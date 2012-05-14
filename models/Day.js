@@ -41,7 +41,7 @@ module.exports = function(app) {
                 .replace(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)/, WEEKDAYS[date.getDay()]);
       }
     });
-    this.array('votees');
+    this.array('voters');
     this.array('locations');
     this.timestamps();
 
@@ -67,8 +67,8 @@ module.exports = function(app) {
               voters = this.voters;
 
           for(i = 0; i < len; i++) {
-            if(locations[i].id === attrs.id ||
-                  locations[i].name.toLowerCase() === attrs.name.toLowerCase()) {
+            if((attrs.id && locations[i]._id === attrs.id) || (attrs.name &&
+                  locations[i].name.toLowerCase() === attrs.name.toLowerCase())) {
 
               locations[i].rating += 1;
               voters.push(attrs.voter);
@@ -193,13 +193,20 @@ function generateDay(callback) {
   Location.available(function(err, locations) {
     if(err) return callback(err);
 
-    top = reorderWeight(locations).slice(0, 2);
-    top.forEach(function(location) {
+    top = reorderWeight(locations).slice(0, 2).map(function(location) {
       //Once a location is picked for the week it's considered used
       location.use();
       location.save(function(err) {
         error = error || err;
       });
+
+      //`Clone` the object
+      return {
+        _id: location._id,
+        name: location.name,
+        rating: 0,
+        resource: location.resource
+      };
     });
 
     //Set used status
