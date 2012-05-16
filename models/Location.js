@@ -24,7 +24,7 @@ Location = module.exports = resourceful.define('location', function() {
   this.string('name', {
     required: true,
     get: function() {
-      var words = this.properties.name.split();
+      var words = this.properties.name.split(' ');
       return words.map(function(word) {
         if(word.length < 2) return word;
         return word.charAt(0).toUpperCase() + word.slice(1);
@@ -81,6 +81,20 @@ Location = module.exports = resourceful.define('location', function() {
     return idx === -1 ? null : this.weight.splice(idx, 1);
   };
 
+  /**
+   * Controller helper function
+   *
+   * @return {Object}
+   */
+  this.prototype.toObject = function() {
+    return {
+      id: this._id,
+      name: this.name,
+      weight: this.weight,
+      used: this.used,
+      resource: this.resource
+    };
+  };
 
   /**
    * Hooks
@@ -128,7 +142,7 @@ function validate(instance, callback) {
     Location.find({ name: name }, function(err, locations) {
       if(err) return callback(err);
       if(locations && locations.length !== 0 &&
-        !(instance.id && instance.id === locations[0].id)) {
+        !(instance._id && instance._id === locations[0]._id)) {
         return callback(new Error('location is already present'));
       }
       return callback(null);

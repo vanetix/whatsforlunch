@@ -88,6 +88,20 @@ module.exports = function(app) {
       }
     };
 
+    /**
+     * Controller helper function
+     *
+     * @return {Object}
+     */
+    this.prototype.toObject = function() {
+      return {
+        id: this._id,
+        day: this.day,
+        voters: this.voters,
+        locations: this.locations,
+        resource: this.resource
+      };
+    };
 
     /**
      * Hooks
@@ -119,10 +133,8 @@ module.exports = function(app) {
 
     /**
      * Emit model events
-     *
-     * @event {update}
      */
-    this.on('update', function(attrs) {
+    this.on('save', function(attrs) {
       app.emitter.emit('day:update', attrs);
     });
 
@@ -167,7 +179,9 @@ function validate(instance, callback) {
       if(err) {
         return callback(err);
       }
-      else if(days && days.length !== 0) {
+      else if(days && days.length !== 0 &&
+        !(instance._id && instance._id === days[0]._id)) {
+
         return callback(new Error('day is already present'));
       }
       else {
@@ -202,7 +216,7 @@ function generateDay(callback) {
 
       //`Clone` the object
       return {
-        _id: location._id,
+        id: location._id,
         name: location.name,
         rating: 0,
         resource: location.resource
