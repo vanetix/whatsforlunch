@@ -13,12 +13,17 @@ module.exports = function(app) {
       if(id) {
         Day.get(id, function(err, day) {
           if(err) return self.res.json(500, { error: 'Error while fetching day' });
-          return self.res.json(200, day);
+          return self.res.json(200, day.toObject());
         });
       }
       else {
         Day.all(function(err, days) {
           if(err) return self.res.json(500, { error: 'Error wile fetching days' });
+
+          days = days.map(function(day) {
+            return day.toObject();
+          });
+
           return self.res.json(200, days);
         });
       }
@@ -32,7 +37,7 @@ module.exports = function(app) {
 
       Day.current(function(err, today) {
         if(err) return self.res.json(500, { error: err.message });
-        return self.res.json(200, today);
+        return self.res.json(200, today.toObject());
       });
     });
 
@@ -53,7 +58,10 @@ module.exports = function(app) {
 
         today.vote(data, function(err, today) {
           if(err) return self.res.json(500, { error: err.message });
-          return self.res.json(200, today);
+          today.save(function(err) {
+            if(err) return self.res.json(500, { error: 'Unable to save vote' });
+            return self.res.json(200, today.toObject());
+          });
         });
       });
     });

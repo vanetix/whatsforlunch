@@ -15,6 +15,11 @@ module.exports = function(app) {
 
       Location.all(function(err, locations) {
         if(err) return self.res.json(404, { error: err.message });
+
+        locations = locations.map(function(location) {
+          return location.toObject();
+        });
+
         return self.res.json(200, locations);
       });
     });
@@ -27,6 +32,11 @@ module.exports = function(app) {
 
       Location.available(function(err, locations) {
         if(err) return self.res.json(500, { error: err.message });
+
+        locations = locations.map(function(location) {
+          return location.toObject();
+        });
+
         return self.res.json(200, locations);
       });
     });
@@ -61,7 +71,7 @@ module.exports = function(app) {
       Location.get(id, function(err, location) {
         if(err) return self.res.json(500, { error: err.message });
         if(!location) return self.res.json(404, { error: 'Not found' });
-        return self.res.json(200, location);
+        return self.res.json(200, location.toObject());
       });
     });
 
@@ -91,7 +101,7 @@ module.exports = function(app) {
           }
           location.save(function(err) {
             if(err) return self.res.json(500, { error: err.message });
-            return self.res.json(200, location);
+            return self.res.json(200, location.toObject());
           });
         });
       }
