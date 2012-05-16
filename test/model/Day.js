@@ -24,7 +24,7 @@ describe('generic', function() {
     should.exist(day);
 
     day.should.have.property('locations').with.instanceof(Array);
-    day.should.have.property('votees').with.instanceof(Array);
+    day.should.have.property('voters').with.instanceof(Array);
     day.should.have.property('day').and.be.a('string');
     day.locations.should.have.lengthOf(2);
   });
