@@ -14,7 +14,6 @@
 
 LUNCH_SERVER = process.env.HUBOT_LUNCH_URL
 
-
 module.exports = (robot) ->
 
   robot.respond /(lunch-today|lunch-locations)$/i, (msg) ->
@@ -56,9 +55,9 @@ locationDispatcher = (msg, method) ->
             locations = sortLocations locations
             locations = locations.map (location) ->
               if !location.weight || !location.weight.length
-                return "#{location._id} - #{location.name}"
+                return "#{location.id} - #{location.name}"
               else
-                return "#{location._id} - #{location.name} - #{location.weight.join(', ')}"
+                return "#{location.id} - #{location.name} - #{location.weight.join(', ')}"
             msg.send "Locations:\n#{locations.join('\n')}"
 
   if method is 'post'
@@ -72,7 +71,7 @@ locationDispatcher = (msg, method) ->
           msg.send "Unable to create location: #{error.error}"
         else
           location = JSON.parse body
-          msg.send "Created location: #{location._id} - #{location.name}"
+          msg.send "Created location: #{location.id} - #{location.name}"
 
   if method is 'put'
     if isNaN msg.match[1]
@@ -88,7 +87,7 @@ locationDispatcher = (msg, method) ->
             msg.send "Unable to update location: #{error.error}"
           else
             location = JSON.parse body
-            msg.send "Updated location: #{location._id} - #{location.name} - #{location.weight.join(', ')}"
+            msg.send "Updated location: #{location.id} - #{location.name} - #{location.weight.join(', ')}"
 
   if method is 'delete'
     if isNaN msg.match[2]
@@ -107,7 +106,8 @@ locationDispatcher = (msg, method) ->
 #POST SERVER/lunch/vote - { id|name, votee }
 voteDispatcher = (msg) ->
   url = LUNCH_SERVER + '/day/today'
-  obj = { voter: msg.message.user.name }
+  obj =
+    voter: msg.message.user.name
   if isNaN msg.match[1]
     obj.name = msg.match[1]
   else
@@ -138,13 +138,13 @@ todayDispatcher = (msg, highest=false) ->
         locations = sortLocations locations
         if not highest
           locations = locations.map (location) ->
-            return "#{location._id} - #{location.name}, Rating: #{location.rating}"
+            return "#{location.id} - #{location.name}, Rating: #{location.rating}"
           msg.send "Todays Locations:\n#{locations.join('\n')}"
         else
           ratings = (location.rating for location in locations)
           highest = ratings.indexOf(Math.max.apply Math, ratings)
           location = locations[highest]
-          msg.send "Top location: #{location._id} - #{location.name}, Rating: #{location.rating}"
+          msg.send "Top location: #{location.id} - #{location.name}, Rating: #{location.rating}"
 
 
 #Sort the given array by id
@@ -153,7 +153,7 @@ sortLocations = (locations) ->
 
   for i in [0..bound]
     for j in [0..bound]
-      if parseInt(locations[j]._id) > parseInt(locations[i]._id)
+      if parseInt(locations[j].id) > parseInt(locations[i].id)
         temp = locations[i]
         locations[i] = locations[j]
         locations[j] = temp
