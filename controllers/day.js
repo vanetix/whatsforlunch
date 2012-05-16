@@ -51,7 +51,7 @@ module.exports = function(app) {
       var self = this,
           data = this.req.body;
 
-      if(!data) return self.res.json(400, { error: 'Invalid update object' });
+      if(!data || (!data.id && !data.name)) return self.res.json(400, { error: 'Invalid update object' });
 
       Day.current(function(err, today) {
         if(err) return self.res.json(500, { error: err.message });

@@ -67,7 +67,7 @@ module.exports = function(app) {
               voters = this.voters;
 
           for(i = 0; i < len; i++) {
-            if((attrs.id && locations[i]._id === attrs.id) || (attrs.name &&
+            if((attrs.id && locations[i].id === attrs.id) || (attrs.name &&
                   locations[i].name.toLowerCase() === attrs.name.toLowerCase())) {
 
               locations[i].rating += 1;
