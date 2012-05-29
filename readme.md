@@ -1,5 +1,5 @@
 # What's for lunch?
-## Generates a lunch poll from a location/location collection
+## Generates a lunch poll from a location collection
 
 # Day generation
 - A new day is generated at the first request for a new day.
@@ -9,7 +9,6 @@
 ## Todo
 - locations are added to the current used set when they are voted the highest for the day
 - **tests**
-
 
 
 # Api Methods
